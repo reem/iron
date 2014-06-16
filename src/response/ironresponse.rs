@@ -1,18 +1,18 @@
-use HttpResponse = http::server::response::ResponseWriter;
+use http::server::response::ResponseWriter;
 use http::server::request::Request;
 use http::headers::response::HeaderCollection;
 use http::status::Status;
 
 use std::io::IoResult;
 
-use super::Response;
+use super::{Response, HttpResponse};
 
 pub struct IronResponse<'a, 'b> {
-    writer: &'a mut HttpResponse<'b>
+    writer: &'a mut ResponseWriter<'b>
 }
 
-impl<'a, 'b> IronResponse<'a, 'b> {
-    pub fn from_http<'a, 'b>(res: &'a mut HttpResponse<'b>) -> IronResponse<'a, 'b> {
+impl<'a, 'b> HttpResponse<'a, 'b> for IronResponse<'a, 'b> {
+    pub fn from_http(res: &'a mut ResponseWriter<'b>) -> IronResponse<'a, 'b> {
         IronResponse {
             writer: res
         }
