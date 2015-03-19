@@ -51,13 +51,7 @@
 //! also do the necessary action.
 //!
 
-use {Request, Response, IronResult, IronError};
-
-/// `Handler`s are responsible for handling requests by creating Responses from Requests.
-pub trait Handler: Send + Sync + 'static {
-    /// Produce a `Response` from a Request, with the possibility of error.
-    fn handle(&self, &mut Request) -> IronResult<Response>;
-}
+use {Request, Response, IronResult, IronError, Handler};
 
 /// `BeforeMiddleware` are fired before a `Handler` is called inside of a Chain.
 ///
@@ -286,19 +280,6 @@ impl Chain {
 
         // We made it with no error!
         Ok(res)
-    }
-}
-
-impl<F> Handler for F
-where F: Send + Sync + 'static + Fn(&mut Request) -> IronResult<Response> {
-    fn handle(&self, req: &mut Request) -> IronResult<Response> {
-        (*self)(req)
-    }
-}
-
-impl Handler for Box<Handler> {
-    fn handle(&self, req: &mut Request) -> IronResult<Response> {
-        (**self).handle(req)
     }
 }
 

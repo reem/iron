@@ -150,6 +150,9 @@ pub mod method {
 // Publicized to show the documentation
 pub mod middleware;
 
+// Contains Handler and IntoHandler
+pub mod handler;
+
 // Response utilities
 pub mod response;
 
