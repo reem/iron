@@ -114,19 +114,22 @@ impl<H: Handler> Iron<H> {
             .ok().and_then(|mut addrs| addrs.next()).expect("Could not parse socket address.");
 
         self.addr = Some(sock_addr);
-
         self.protocol = Some(protocol.clone());
 
         match protocol {
-            Protocol::Http => try!(Server::http(sock_addr)).handle_threads(self, threads),
+            Protocol::Http => {
+                let mut server = try!(Server::http(sock_addr));
+                server.keep_alive(::std::time::Duration::from_secs(10000));
+                server.handle_threads(self, threads)
+            }
 
             #[cfg(feature = "ssl")]
             Protocol::Https { ref certificate, ref key } => {
                 use hyper::net::Openssl;
 
-                try!(Server::https(sock_addr,
-                                   try!(Openssl::with_cert_and_key(certificate, key))))
-                    .handle_threads(self, threads)
+                let mut server = try!(Server::https(sock_addr, try!(Openssl::with_cert_and_key(certificate, key))));
+                server.keep_alive(::std::time::Duration::from_secs(10000));
+                server.handle_threads(self, threads)
             }
         }
     }
