@@ -61,3 +61,29 @@ impl StdError for IronError {
     }
 }
 
+// Some errors for common use
+
+/// NotFound Error.
+///
+/// For use when the cause of an error is that some resource is not found.
+///
+/// Optionally contains another Error with more detail.
+#[derive(Debug, Default)]
+pub struct NotFound(pub Option<Box<Error + Send>>);
+
+impl StdError for NotFound {
+    fn description(&self) -> &str {
+        "Not Found"
+    }
+
+    fn cause(&self) -> Option<&StdError> {
+        self.0.as_ref().and_then(|e| e.cause())
+    }
+}
+
+impl fmt::Display for NotFound {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        fmt::Debug::fmt(self, f)
+    }
+}
+
